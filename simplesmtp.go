@@ -9,17 +9,16 @@ import (
 const (
 	DEFAULT_SMTP_HOST = "smtp.gmail.com"
 	DEFAULT_SMTP_PORT = 587
+	msg               = "From: %s \n" +
+		"To: %s \n" +
+		"Subject: %s \n\n %s"
 )
 
-type ISimpleSmtp interface {
-	Send()
-}
-
 type SimpleSmtp struct {
-	Email    string      // email address
-	Password string      // password of smtp account
-	Host     string      // smtp host default is "smtp.gmail.com"
-	Port     int         // smtp port default is 587
+	Email    string      // your email address
+	Password string      // your password of smtp account
+	Host     string      // smtp host, default is "smtp.gmail.com"
+	Port     int         // smtp port, default is 587
 	To       []string    // email address to send
 	Subject  string      // email subject
 	Body     interface{} // email body
@@ -40,7 +39,7 @@ func (s *SimpleSmtp) Send() {
 	}
 
 	for _, email := range s.To {
-		if err := smtp.SendMail(s.Host+":"+strconv.Itoa(s.Port), smtp.PlainAuth("", s.Email, s.Password, s.Host), s.Email, []string{email}, []byte(s.Body.(string))); err != nil {
+		if err := smtp.SendMail(s.Host+":"+strconv.Itoa(s.Port), smtp.PlainAuth("", s.Email, s.Password, s.Host), s.Email, []string{email}, []byte(fmt.Sprintf(msg, s.Email, email, s.Subject, s.Body))); err != nil {
 			panic(err)
 		}
 	}
